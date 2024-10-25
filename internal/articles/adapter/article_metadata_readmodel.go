@@ -195,7 +195,7 @@ func (p PostgresArticleMetadataReadmodel) ArticleList(
 	offset, limit int,
 	tags []string,
 	categoryID *string,
-) ([]query.ArticleView, error) {
+) ([]query.ArticleResult, error) {
 	tx := p.joinsTable(
 		p.db.WithContext(ctx).
 			Model(&ArticleMetadata{}).
@@ -225,9 +225,9 @@ func (p PostgresArticleMetadataReadmodel) ArticleList(
 		return nil, e.InternalServiceError(err.Error())
 	}
 
-	var views = make([]query.ArticleView, len(articleList))
+	var views = make([]query.ArticleResult, len(articleList))
 	for i, view := range articleList {
-		views[i] = query.ArticleView{
+		views[i] = query.ArticleResult{
 			Uri:         view.ArticleMetadata.URI,
 			Title:       view.ArticleVersion.Title,
 			Version:     view.ArticleMetadata.CurrentVersion,
@@ -236,7 +236,7 @@ func (p PostgresArticleMetadataReadmodel) ArticleList(
 			Content:     view.ArticleVersion.Content,
 			Visibility:  view.ArticleMetadata.Visibility,
 			CreatedAt:   view.FirstVersionCreatedAt.UnixMilli(),
-			Category: query.ArticleCategoryView{
+			Category: query.ArticleCategoryResult{
 				Slug: view.Category.Slug,
 				Name: view.Category.Name,
 			},
@@ -246,7 +246,7 @@ func (p PostgresArticleMetadataReadmodel) ArticleList(
 	return views, nil
 }
 
-func (p PostgresArticleMetadataReadmodel) ArticleMetadataList(ctx context.Context, offset, limit int, tags []string, categoryID *string) ([]query.ArticleMetadataView, error) {
+func (p PostgresArticleMetadataReadmodel) ArticleMetadataList(ctx context.Context, offset, limit int, tags []string, categoryID *string) ([]query.ArticleMetadataResult, error) {
 	var models = make([]articleMetadataWithVersion, 0)
 	tx := p.joinsTable(
 		p.db.WithContext(ctx).
@@ -263,13 +263,13 @@ func (p PostgresArticleMetadataReadmodel) ArticleMetadataList(ctx context.Contex
 		return nil, e.InternalServiceError(err.Error())
 	}
 
-	var views = make([]query.ArticleMetadataView, len(models))
+	var views = make([]query.ArticleMetadataResult, len(models))
 	for i, model := range models {
-		views[i] = query.ArticleMetadataView{
+		views[i] = query.ArticleMetadataResult{
 			URI:        model.ArticleMetadata.URI,
 			Version:    model.ArticleMetadata.CurrentVersion,
 			Visibility: model.ArticleMetadata.Visibility,
-			Category: query.ArticleCategoryView{
+			Category: query.ArticleCategoryResult{
 				Slug: model.Category.Slug,
 				Name: model.Category.Name,
 			},
@@ -280,7 +280,7 @@ func (p PostgresArticleMetadataReadmodel) ArticleMetadataList(ctx context.Contex
 	return views, nil
 }
 
-func (p PostgresArticleMetadataReadmodel) ArticleMetadata(ctx context.Context, uri string) (query.ArticleMetadataView, error) {
+func (p PostgresArticleMetadataReadmodel) ArticleMetadata(ctx context.Context, uri string) (query.ArticleMetadataResult, error) {
 	var model articleMetadataWithVersion
 	result := p.joinsTable(
 		p.db.WithContext(ctx).
@@ -290,16 +290,16 @@ func (p PostgresArticleMetadataReadmodel) ArticleMetadata(ctx context.Context, u
 	).Where("article_metadata.uri = ?", uri).Find(&model)
 
 	if result.Error != nil {
-		return query.ArticleMetadataView{}, e.InternalServiceError(result.Error.Error())
+		return query.ArticleMetadataResult{}, e.InternalServiceError(result.Error.Error())
 	} else if result.RowsAffected != 1 {
-		return query.ArticleMetadataView{}, e.ResourceDoesNotExist
+		return query.ArticleMetadataResult{}, e.ResourceDoesNotExist
 	}
 
-	return query.ArticleMetadataView{
+	return query.ArticleMetadataResult{
 		URI:        model.ArticleMetadata.URI,
 		Version:    model.ArticleMetadata.CurrentVersion,
 		Visibility: model.ArticleMetadata.Visibility,
-		Category: query.ArticleCategoryView{
+		Category: query.ArticleCategoryResult{
 			Slug: model.Category.Slug,
 			Name: model.Category.Name,
 		},
@@ -308,7 +308,7 @@ func (p PostgresArticleMetadataReadmodel) ArticleMetadata(ctx context.Context, u
 	}, nil
 }
 
-func (p PostgresArticleMetadataReadmodel) ArticleContent(ctx context.Context, uri string, version *string) (query.ArticleView, error) {
+func (p PostgresArticleMetadataReadmodel) ArticleContent(ctx context.Context, uri string, version *string) (query.ArticleResult, error) {
 	tx := p.joinsTable(p.db.WithContext(ctx).
 		Model(&ArticleMetadata{}).
 		Select(
@@ -336,12 +336,12 @@ func (p PostgresArticleMetadataReadmodel) ArticleContent(ctx context.Context, ur
 	result := tx.Find(&view)
 
 	if result.Error != nil {
-		return query.ArticleView{}, e.InternalServiceError(result.Error.Error())
+		return query.ArticleResult{}, e.InternalServiceError(result.Error.Error())
 	} else if result.RowsAffected != 1 {
-		return query.ArticleView{}, e.ResourceDoesNotExist
+		return query.ArticleResult{}, e.ResourceDoesNotExist
 	}
 
-	return query.ArticleView{
+	return query.ArticleResult{
 		Uri:         view.ArticleMetadata.URI,
 		Title:       view.ArticleVersion.Title,
 		Version:     view.ArticleMetadata.CurrentVersion,
@@ -350,7 +350,7 @@ func (p PostgresArticleMetadataReadmodel) ArticleContent(ctx context.Context, ur
 		Content:     view.ArticleVersion.Content,
 		Visibility:  view.ArticleMetadata.Visibility,
 		CreatedAt:   view.ArticleMetadata.FirstVersionCreatedAt.UnixMilli(),
-		Category: query.ArticleCategoryView{
+		Category: query.ArticleCategoryResult{
 			Slug: view.Category.Slug,
 			Name: view.Category.Name,
 		},

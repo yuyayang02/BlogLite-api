@@ -2,19 +2,19 @@ package query
 
 import "context"
 
-type CategroyView struct {
+type CategroyResult struct {
 	Slug        string `json:"slug"`
 	Name        string `json:"name"`
 	Description string `json:"description"`
 }
 
 type CategoryListView struct {
-	Count int            `json:"count"`
-	Items []CategroyView `json:"items"`
+	Count int              `json:"count"`
+	Items []CategroyResult `json:"items"`
 }
 
 type CategoryListReadmodel interface {
-	CategoryList(context.Context) ([]CategroyView, error)
+	CategoryList(context.Context) ([]CategroyResult, error)
 }
 
 type CategoryListHandler struct {

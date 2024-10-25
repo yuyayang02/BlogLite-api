@@ -72,16 +72,16 @@ func (p PostgresCategoryRepository) Remove(ctx context.Context, category *catego
 	return nil
 }
 
-func (p PostgresCategoryRepository) CategoryList(ctx context.Context) ([]query.CategroyView, error) {
+func (p PostgresCategoryRepository) CategoryList(ctx context.Context) ([]query.CategroyResult, error) {
 	var models = make([]Category, 0)
 	err := p.db.WithContext(ctx).Find(&models).Error
 	if err != nil {
 		return nil, e.InternalServiceError(err.Error())
 	}
 
-	var views = make([]query.CategroyView, len(models))
+	var views = make([]query.CategroyResult, len(models))
 	for i, model := range models {
-		views[i] = query.CategroyView{
+		views[i] = query.CategroyResult{
 			Slug:        model.Slug,
 			Name:        model.Name,
 			Description: model.Description,

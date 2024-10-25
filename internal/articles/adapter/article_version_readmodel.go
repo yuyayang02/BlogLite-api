@@ -115,16 +115,16 @@ func (p PostgresArticleVersionReadmodel) handleArticleVersionContentDeletedEvent
 	return nil
 }
 
-func (p PostgresArticleVersionReadmodel) ArticleVersionList(ctx context.Context, uri string) ([]query.ArticleVersionView, error) {
+func (p PostgresArticleVersionReadmodel) ArticleVersionList(ctx context.Context, uri string) ([]query.ArticleVersionResult, error) {
 	var models = make([]ArticleVersion, 0)
 	err := p.db.WithContext(ctx).Model(&ArticleVersion{}).Where("uri = ?", uri).Find(&models).Error
 	if err != nil {
 		return nil, e.InternalServiceError(err.Error())
 	}
 
-	var view = make([]query.ArticleVersionView, len(models))
+	var view = make([]query.ArticleVersionResult, len(models))
 	for i, model := range models {
-		view[i] = query.ArticleVersionView{
+		view[i] = query.ArticleVersionResult{
 			Version:   model.Version,
 			Note:      model.Note,
 			Title:     model.Title,

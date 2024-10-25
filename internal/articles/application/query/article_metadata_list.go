@@ -14,7 +14,7 @@ type ArticleMetadataList struct {
 }
 
 type ArticleMetadataListReadmodel interface {
-	ArticleMetadataList(ctx context.Context, offset, limit int, tags []string, categoryID *string) ([]ArticleMetadataView, error)
+	ArticleMetadataList(ctx context.Context, offset, limit int, tags []string, categoryID *string) ([]ArticleMetadataResult, error)
 }
 
 type ArticleMetadataListHandler struct {
@@ -25,7 +25,7 @@ func NewArticleMetadataListHandler(rm ArticleMetadataListReadmodel) *ArticleMeta
 	return &ArticleMetadataListHandler{rm: rm}
 }
 
-func (h ArticleMetadataListHandler) Handle(ctx context.Context, query ArticleMetadataList) (ArticleMetadataListView, error) {
+func (h ArticleMetadataListHandler) Handle(ctx context.Context, query ArticleMetadataList) (ArticleMetadataListResult, error) {
 	var (
 		page  = 1
 		limit = constant.ArticleMetadataListDefaultLimit
@@ -48,14 +48,14 @@ func (h ArticleMetadataListHandler) Handle(ctx context.Context, query ArticleMet
 	)
 
 	if err != nil {
-		return ArticleMetadataListView{}, err
+		return ArticleMetadataListResult{}, err
 	}
 	listLen := len(list)
 	next := listLen > limit
 	if next {
 		list = list[:listLen-1]
 	}
-	return ArticleMetadataListView{
+	return ArticleMetadataListResult{
 		Count: len(list),
 		Page:  page,
 		Items: list,

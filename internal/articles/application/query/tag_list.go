@@ -14,12 +14,12 @@ func NewTagListHandler(rm TagListReadmodel) *TagListHandler {
 	return &TagListHandler{rm: rm}
 }
 
-func (t TagListHandler) Handle(ctx context.Context) (TagListView, error) {
+func (t TagListHandler) Handle(ctx context.Context) (TagListResult, error) {
 	list, err := t.rm.TagList(ctx)
 	if err != nil {
-		return TagListView{}, err
+		return TagListResult{}, err
 	}
-	return TagListView{
+	return TagListResult{
 		Count: len(list),
 		Items: list,
 	}, nil

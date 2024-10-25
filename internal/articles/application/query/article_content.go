@@ -8,7 +8,7 @@ type ArticleContent struct {
 }
 
 type ArticleContentReadmodel interface {
-	ArticleContent(ctx context.Context, uri string, version *string) (ArticleView, error)
+	ArticleContent(ctx context.Context, uri string, version *string) (ArticleResult, error)
 }
 
 type ArticleContentHandler struct {
@@ -19,6 +19,6 @@ func NewArticleContentHandler(rm ArticleContentReadmodel) *ArticleContentHandler
 	return &ArticleContentHandler{rm: rm}
 }
 
-func (h ArticleContentHandler) Handle(ctx context.Context, query ArticleContent) (ArticleView, error) {
+func (h ArticleContentHandler) Handle(ctx context.Context, query ArticleContent) (ArticleResult, error) {
 	return h.rm.ArticleContent(ctx, query.URI, query.Version)
 }

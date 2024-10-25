@@ -14,7 +14,7 @@ type ArticleList struct {
 }
 
 type ArticleListReadmodel interface {
-	ArticleList(ctx context.Context, offset, limit int, tags []string, categoryID *string) ([]ArticleView, error)
+	ArticleList(ctx context.Context, offset, limit int, tags []string, categoryID *string) ([]ArticleResult, error)
 }
 
 type ArticleListHandler struct {
@@ -25,7 +25,7 @@ func NewArticleListHandler(rm ArticleListReadmodel) *ArticleListHandler {
 	return &ArticleListHandler{rm: rm}
 }
 
-func (a *ArticleListHandler) Handle(ctx context.Context, query ArticleList) (ArticleListView, error) {
+func (a *ArticleListHandler) Handle(ctx context.Context, query ArticleList) (ArticleListResult, error) {
 	var (
 		page  = 1 // 默认第一页
 		limit = constant.ArticleListDefaultLimit
@@ -48,14 +48,14 @@ func (a *ArticleListHandler) Handle(ctx context.Context, query ArticleList) (Art
 	)
 
 	if err != nil {
-		return ArticleListView{}, err
+		return ArticleListResult{}, err
 	}
 	listLen := len(list)
 	next := listLen > limit
 	if next {
 		list = list[:listLen-1]
 	}
-	return ArticleListView{
+	return ArticleListResult{
 		Count: len(list),
 		Page:  page,
 		Items: list,
