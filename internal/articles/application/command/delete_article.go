@@ -2,34 +2,33 @@ package command
 
 import (
 	"context"
-	"github.com/qmstar0/BlogLite-api/internal/articles/domain/articles"
-	"github.com/qmstar0/BlogLite-api/internal/common/e"
+	"github.com/yuyayang02/BlogLite-api/internal/articles/domain/articles"
 )
 
 type DeleteArticle struct {
-	Uri string
+	URI string
 }
 
 type DeleteArticleHandler struct {
-	resp articles.ArticleRepository
+	repo articles.ArticleRepository
 }
 
 func NewDeleteArticleHandler(resp articles.ArticleRepository) *DeleteArticleHandler {
-	return &DeleteArticleHandler{resp: resp}
+	return &DeleteArticleHandler{repo: resp}
 }
 
 func (h DeleteArticleHandler) Handle(ctx context.Context, cmd DeleteArticle) error {
-	uri := articles.NewUri(cmd.Uri)
-	if err := uri.CheckFormat(); err != nil {
+	uri, err := articles.NewUri(cmd.URI)
+	if err != nil {
 		return err
 	}
 
-	if found, err := h.resp.Find(ctx, uri); err != nil {
+	if found, err := h.repo.Find(ctx, uri); err != nil {
 		return err
 	} else if found == nil {
-		return e.ResourceDoesNotExist
+		return errors.ResourceDoesNotExist
 	} else {
 		found.Delete()
-		return h.resp.Remove(ctx, found)
+		return h.repo.Remove(ctx, found)
 	}
 }

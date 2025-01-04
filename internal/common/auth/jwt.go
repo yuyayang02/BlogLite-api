@@ -2,9 +2,8 @@ package auth
 
 import (
 	"errors"
-	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
-	"github.com/qmstar0/BlogLite-api/config"
+	"github.com/yuyayang02/BlogLite-api/internal/common/config"
 	"time"
 )
 

@@ -2,35 +2,35 @@ package service
 
 import (
 	"context"
-	"github.com/qmstar0/BlogLite-api/internal/articles/adapter"
-	"github.com/qmstar0/BlogLite-api/internal/articles/application"
-	"github.com/qmstar0/BlogLite-api/internal/articles/application/command"
-	"github.com/qmstar0/BlogLite-api/internal/articles/application/query"
-	categoryAdapter "github.com/qmstar0/BlogLite-api/internal/categories/adapter"
-	"github.com/qmstar0/BlogLite-api/pkg/postgresql"
 	"github.com/qmstar0/shutdown"
+	"github.com/yuyayang02/BlogLite-api/internal/articles/application"
+	"github.com/yuyayang02/BlogLite-api/internal/articles/application/command"
+	"github.com/yuyayang02/BlogLite-api/internal/articles/application/query"
+	"github.com/yuyayang02/BlogLite-api/internal/articles/infra"
+	categoryAdapter "github.com/yuyayang02/BlogLite-api/internal/categories/adapter"
+	"github.com/yuyayang02/BlogLite-api/internal/common/database/postgresql"
 )
 
 func NewComponentTestApplication(ctx context.Context) *application.App {
 	return newApplication(
 		ctx,
 		MockCategoryValidityCheckService{},
-		adapter.NewMarkdownParser(),
+		infra.NewMarkdownParser(),
 	)
 }
 
 func NewApplication(ctx context.Context) *application.App {
 	db := postgresql.GetDB()
-	categoryValidityCheckService := adapter.NewCategoryValidityCheckService(categoryAdapter.NewPostgresCategoryRepository(db))
+	categoryValidityCheckService := infrastructure.NewCategoryValidityCheckService(categoryAdapter.NewPostgresCategoryRepository(db))
 	return newApplication(
 		ctx,
 		categoryValidityCheckService,
-		adapter.NewMarkdownParser(),
+		infrastructure.NewMarkdownParser(),
 	)
 }
 
 func newApplication(ctx context.Context, categoryService command.CategoryValidityCheckService, markdownService command.MarkdownParseService) *application.App {
-	bus := adapter.NewBus()
+	bus := infrastructure.NewBus()
 	//bus.Register("test", mockHandler{})
 	defer func() {
 		bus.Run(ctx)
@@ -39,11 +39,11 @@ func newApplication(ctx context.Context, categoryService command.CategoryValidit
 
 	db := postgresql.GetDB()
 
-	repo := adapter.NewPostgresArticleRepository(db, bus)
+	repo := infrastructure.NewPostgresArticleRepository(db, bus)
 
-	articleMetadataReadmodel := adapter.NewPostgresArticleMetadataReadmodel(db)
-	articleTagReadmodel := adapter.NewPostgresArticleTagReadmodel(db)
-	articleVersionReadmodel := adapter.NewPostgresArticleVersionReadmodel(db)
+	articleMetadataReadmodel := infrastructure.NewPostgresArticleMetadataReadmodel(db)
+	articleTagReadmodel := infrastructure.NewPostgresArticleTagReadmodel(db)
+	articleVersionReadmodel := infrastructure.NewPostgresArticleVersionReadmodel(db)
 
 	bus.Register("article-detail-readmodel", articleMetadataReadmodel)
 	bus.Register("article-tag-readmodel", articleTagReadmodel)
@@ -57,7 +57,7 @@ func newApplication(ctx context.Context, categoryService command.CategoryValidit
 			ChangeArticleVisibility: command.NewChangeArticleVisibilityHandler(repo),
 			DeleteArticle:           command.NewDeleteArticleHandler(repo),
 			SetArticleVersion:       command.NewSetArticleVersionHandler(repo),
-			AddNewVersion:           command.NewAddNewVersionHandler(repo, markdownService, adapter.NewArticleVersionDuplicationCheckService(db)),
+			AddNewVersion:           command.NewAddNewVersionHandler(repo, markdownService, infrastructure.NewArticleVersionDuplicationCheckService(db)),
 			ChangeArticleCategory:   command.NewChangeArticleCategoryHandler(repo, categoryService),
 		},
 		Query: application.Query{

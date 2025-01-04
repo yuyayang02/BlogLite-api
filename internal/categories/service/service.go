@@ -2,38 +2,43 @@ package service
 
 import (
 	"context"
-	"github.com/qmstar0/BlogLite-api/internal/categories/adapter"
-	"github.com/qmstar0/BlogLite-api/internal/categories/application"
-	"github.com/qmstar0/BlogLite-api/internal/categories/application/command"
-	"github.com/qmstar0/BlogLite-api/internal/categories/application/query"
-	"github.com/qmstar0/BlogLite-api/pkg/postgresql"
+	"github.com/yuyayang02/BlogLite-api/internal/categories/application"
+	"github.com/yuyayang02/BlogLite-api/internal/categories/application/command"
+	"github.com/yuyayang02/BlogLite-api/internal/categories/application/query"
+	"github.com/yuyayang02/BlogLite-api/internal/categories/infra"
+	"github.com/yuyayang02/BlogLite-api/internal/common/database/postgresql"
+	"github.com/yuyayang02/BlogLite-api/internal/common/logging"
+	"github.com/yuyayang02/BlogLite-api/internal/common/metrics"
 )
 
 func NewComponentTestApplication(ctx context.Context) *application.App {
-	return newApplication(ctx, MockGetCategoryUsedService{})
+	return newApplication(ctx, MockCategoryDeletionChecker{})
 }
 
 func NewApplication(ctx context.Context) *application.App {
 	db := postgresql.GetDB()
 
-	service := adapter.NewGetCategoryUsedService(db)
+	service := infra.NewGetCategoryUsedService(db)
 	return newApplication(ctx, service)
 }
 
-func newApplication(ctx context.Context, service command.GetCategoryUsedService) *application.App {
+func newApplication(ctx context.Context, service command.CategoryDeletionChecker) *application.App {
 
 	db := postgresql.GetDB()
 
-	repo := adapter.NewPostgresCategoryRepository(db)
+	repo := infra.NewPostgresCategoryRepository(db)
+
+	metricsClient := metrics.NewMockMetrics()
+
+	logger := logging.Logger()
 
 	return &application.App{
 		Command: application.Command{
-			CreateCategory:            command.NewCreateCategoryHandler(repo),
-			ModifyCategoryDescription: command.NewModifyCategoryDescriptionHandler(repo),
-			DeleteCategory:            command.NewCheckAndDeleteCategoryHandler(service, command.NewDeleteCategoryHandler(repo)),
+			CreateCategory: command.NewCreateCategoryHandler(repo, logger, metricsClient),
+			DeleteCategory: command.NewDeleteCategoryHandler(repo, service, logger, metricsClient),
 		},
 		Query: application.Query{
-			CategoryList: query.NewCategoryListHandler(repo),
+			CategoryList: query.NewCategoryListHandler(repo, logger, metricsClient),
 		},
 	}
 }

@@ -19,11 +19,9 @@ type ArticleCategoryResult struct {
 }
 
 type ArticleListResult struct {
-	Count int             `json:"count"`
+	Total int             `json:"total"`
 	Page  int             `json:"page"`
 	Items []ArticleResult `json:"items"`
-	Prev  bool            `json:"prev"`
-	Next  bool            `json:"next"`
 }
 
 type ArticleVersionResult struct {
@@ -53,9 +51,7 @@ type ArticleMetadataResult struct {
 }
 
 type ArticleMetadataListResult struct {
-	Count int                     `json:"count"`
+	Total int                     `json:"total"`
 	Page  int                     `json:"page"`
 	Items []ArticleMetadataResult `json:"items"`
-	Prev  bool                    `json:"prev"`
-	Next  bool                    `json:"next"`
 }

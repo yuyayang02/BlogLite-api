@@ -1,8 +1,8 @@
 package application
 
 import (
-	"github.com/qmstar0/BlogLite-api/internal/categories/application/command"
-	"github.com/qmstar0/BlogLite-api/internal/categories/application/query"
+	"github.com/yuyayang02/BlogLite-api/internal/categories/application/command"
+	"github.com/yuyayang02/BlogLite-api/internal/categories/application/query"
 )
 
 type App struct {
@@ -11,11 +11,10 @@ type App struct {
 }
 
 type Command struct {
-	CreateCategory            *command.CreateCategoryHandler
-	ModifyCategoryDescription *command.ModifyCategoryDescriptionHandler
-	DeleteCategory            *command.CheckAndDeleteCategoryHandler
+	CreateCategory command.CreateCategoryHandler
+	DeleteCategory command.DeleteCategoryHandler
 }
 
 type Query struct {
-	CategoryList *query.CategoryListHandler
+	CategoryList query.CategoryListHandler
 }

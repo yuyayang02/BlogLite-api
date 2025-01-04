@@ -13,12 +13,12 @@ package service_test
 //	assert.NoError(t, app.Command.CreateCategory.Handle(ctx, command.CreateCategory{
 //		Slug:        "new-categoryID",
 //		Name:        "test-name",
-//		Description: "这是一段简介",
+//		description: "这是一段简介",
 //	}))
 //
 //	assert.NoError(t, app.Command.ModifyCategoryDescription.Handle(ctx, command.ModifyCategoryDescription{
 //		CategorySlug: "test-slug",
-//		Description:  "这是一段新的简介",
+//		description:  "这是一段新的简介",
 //	}))
 //
 //	assert.NoError(t, app.Command.DeleteCategory.Handle(ctx, command.CheckAndDeleteCategory{CategorySlug: "test-slug"}))

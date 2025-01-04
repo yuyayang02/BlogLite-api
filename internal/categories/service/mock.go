@@ -2,9 +2,9 @@ package service
 
 import "context"
 
-type MockGetCategoryUsedService struct {
+type MockCategoryDeletionChecker struct {
 }
 
-func (m MockGetCategoryUsedService) IsUsed(ctx context.Context, categorySlug string) (bool, error) {
-	return false, nil
+func (m MockCategoryDeletionChecker) CanDelete(ctx context.Context, slug string) (bool, error) {
+	return true, nil
 }

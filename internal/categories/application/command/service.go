@@ -2,6 +2,6 @@ package command
 
 import "context"
 
-type GetCategoryUsedService interface {
-	IsUsed(ctx context.Context, categorySlug string) (bool, error)
+type CategoryDeletionChecker interface {
+	CanDelete(ctx context.Context, slug string) (bool, error)
 }

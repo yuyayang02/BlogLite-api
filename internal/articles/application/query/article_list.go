@@ -2,8 +2,8 @@ package query
 
 import (
 	"context"
-	"github.com/qmstar0/BlogLite-api/internal/common/constant"
-	"github.com/qmstar0/BlogLite-api/pkg/utils"
+	"github.com/yuyayang02/BlogLite-api/internal/common/constant"
+	"github.com/yuyayang02/BlogLite-api/internal/common/utils"
 )
 
 type ArticleList struct {
@@ -14,7 +14,8 @@ type ArticleList struct {
 }
 
 type ArticleListReadmodel interface {
-	ArticleList(ctx context.Context, offset, limit int, tags []string, categoryID *string) ([]ArticleResult, error)
+	// ArticleList 返回总文章数，当前页内容，错误
+	ArticleList(ctx context.Context, offset, limit int, tags []string, categoryID *string) (int, []ArticleResult, error)
 }
 
 type ArticleListHandler struct {
@@ -27,7 +28,7 @@ func NewArticleListHandler(rm ArticleListReadmodel) *ArticleListHandler {
 
 func (a *ArticleListHandler) Handle(ctx context.Context, query ArticleList) (ArticleListResult, error) {
 	var (
-		page  = 1 // 默认第一页
+		page  = 1
 		limit = constant.ArticleListDefaultLimit
 	)
 
@@ -39,27 +40,20 @@ func (a *ArticleListHandler) Handle(ctx context.Context, query ArticleList) (Art
 		limit = *query.Limit
 	}
 
-	list, err := a.rm.ArticleList(
+	total, list, err := a.rm.ArticleList(
 		ctx,
 		utils.Offset(page, limit),
-		limit+1,
+		limit,
 		query.Tags,
 		query.Category,
 	)
-
 	if err != nil {
 		return ArticleListResult{}, err
 	}
-	listLen := len(list)
-	next := listLen > limit
-	if next {
-		list = list[:listLen-1]
-	}
+
 	return ArticleListResult{
-		Count: len(list),
+		Total: total,
 		Page:  page,
 		Items: list,
-		Prev:  page > 1,
-		Next:  next,
 	}, nil
 }

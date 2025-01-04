@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"github.com/qmstar0/BlogLite-api/config"
-	"github.com/qmstar0/BlogLite-api/internal/common/auth"
+	"github.com/yuyayang02/BlogLite-api/internal/common/auth"
+	"github.com/yuyayang02/BlogLite-api/internal/common/config"
 	"log"
 	"net/http"
 )

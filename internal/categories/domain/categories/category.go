@@ -1,49 +1,41 @@
 package categories
 
-import (
-	"github.com/qmstar0/BlogLite-api/internal/common/e"
-)
+import "github.com/yuyayang02/BlogLite-api/internal/common/errors"
 
 type Category struct {
-	slug        string
-	name        string
-	description string
+	slug string
+	name string
 }
 
-func NewCategory(slug, name, description string) *Category {
+const (
+	CategoryNameMaxSize = 30
+	CategorySlugMaxSize = 20
+)
+
+func NewCategory(slug, name string) (*Category, error) {
+
+	if len(name) > CategoryNameMaxSize {
+		return nil, errors.NewDomainErrorf("分类名称过长，最大长度为 %d 字节", CategoryNameMaxSize)
+	}
+
+	if len(slug) > CategorySlugMaxSize {
+		return nil, errors.NewDomainErrorf("分类标识符过长，最大长度为 %d 字节", CategorySlugMaxSize)
+	}
+
 	return &Category{
-		slug:        slug,
-		name:        name,
-		description: description,
-	}
+		slug: slug,
+		name: name,
+	}, nil
 }
 
-func (c *Category) ModifyDescription(newDescription string) error {
-	if newDescription == "" {
-		return e.InvalidActionError("内容不能为空")
-	}
-	c.description = newDescription
-	return nil
-}
-
-func (c *Category) Slug() string {
-	return c.slug
-}
-
-func (c *Category) Name() string {
-	return c.name
-}
-
-func (c *Category) Description() string {
-	return c.description
-}
+func (c *Category) Slug() string { return c.slug }
+func (c *Category) Name() string { return c.name }
 
 func UnmarshalCategoryFromDatabase(
-	slug, name, description string,
+	slug, name string,
 ) *Category {
 	return &Category{
-		slug:        slug,
-		name:        name,
-		description: description,
+		slug: slug,
+		name: name,
 	}
 }

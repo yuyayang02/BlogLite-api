@@ -2,11 +2,11 @@ package auth
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/qmstar0/BlogLite-api/config"
-	"github.com/qmstar0/BlogLite-api/internal/common/constant"
-	"github.com/qmstar0/BlogLite-api/internal/common/e"
-	"github.com/qmstar0/BlogLite-api/internal/common/server/httpresponse"
-	"github.com/qmstar0/BlogLite-api/pkg/utils"
+	"github.com/yuyayang02/BlogLite-api/internal/common/config"
+	"github.com/yuyayang02/BlogLite-api/internal/common/constant"
+	"github.com/yuyayang02/BlogLite-api/internal/common/errors"
+	"github.com/yuyayang02/BlogLite-api/internal/common/server/httpresponse"
+	"github.com/yuyayang02/BlogLite-api/internal/common/utils"
 )
 
 type GetAuthJSONParams struct {
@@ -21,13 +21,13 @@ func GetAuth(c *gin.Context) {
 	}
 
 	if req.Password != config.Cfg.AuthAdminPassword {
-		httpresponse.Error(c, e.PWDError)
+		httpresponse.Error(c, errors.PWDError)
 		return
 	}
 
 	sign, err := Sign(NewUserCliaims(Admin.ID, Admin.Type, Admin.Name, constant.DefaultJWTAuthDuration))
 	if err != nil {
-		httpresponse.Error(c, e.InternalServiceError(err.Error()))
+		httpresponse.Error(c, errors.InternalServiceError(err.Error()))
 		return
 	}
 

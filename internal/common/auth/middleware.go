@@ -3,7 +3,6 @@ package auth
 import (
 	"context"
 	"github.com/gin-gonic/gin"
-	"github.com/qmstar0/BlogLite-api/internal/common/e"
 	"strings"
 )
 
@@ -26,11 +25,11 @@ const userTokenContextKey = "__userTokenContextKey"
 func GetUserFromContext(ctx context.Context) (*UserClaims, error) {
 	userTokenStr, exits := ctx.Value(userTokenContextKey).(string)
 	if !exits {
-		return nil, e.UnauthorisedError("用户未登录")
+		return nil, errors.UnauthorisedError("用户未登录")
 	}
 	user, err := Verify(userTokenStr)
 	if err != nil {
-		return nil, e.UnauthorisedError(err.Error())
+		return nil, errors.UnauthorisedError(err.Error())
 	}
 	return user, nil
 }

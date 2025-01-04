@@ -1,8 +1,8 @@
 package application
 
 import (
-	"github.com/qmstar0/BlogLite-api/internal/articles/application/command"
-	"github.com/qmstar0/BlogLite-api/internal/articles/application/query"
+	"github.com/yuyayang02/BlogLite-api/internal/articles/application/command"
+	"github.com/yuyayang02/BlogLite-api/internal/articles/application/query"
 )
 
 type App struct {

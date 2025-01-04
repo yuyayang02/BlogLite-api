@@ -1,6 +1,10 @@
 package query
 
-import "context"
+import (
+	"context"
+	"github.com/sirupsen/logrus"
+	"github.com/yuyayang02/BlogLite-api/internal/common/decorator"
+)
 
 type CategroyResult struct {
 	Slug        string `json:"slug"`
@@ -8,30 +12,45 @@ type CategroyResult struct {
 	Description string `json:"description"`
 }
 
-type CategoryListView struct {
+type CategoryListQuery struct {
+}
+
+type CategoryListResult struct {
 	Count int              `json:"count"`
 	Items []CategroyResult `json:"items"`
 }
 
-type CategoryListReadmodel interface {
-	CategoryList(context.Context) ([]CategroyResult, error)
-}
+type (
+	CategoryListReadmodel interface {
+		CategoryList(context.Context) ([]CategroyResult, error)
+	}
 
-type CategoryListHandler struct {
+	CategoryListHandler decorator.QueryHandler[CategoryListQuery, CategoryListResult]
+)
+
+type categoryListHandler struct {
 	rm CategoryListReadmodel
 }
 
-func NewCategoryListHandler(rm CategoryListReadmodel) *CategoryListHandler {
-	return &CategoryListHandler{rm: rm}
+func NewCategoryListHandler(
+	rm CategoryListReadmodel,
+	logger *logrus.Entry,
+	client decorator.MetricsClient,
+) CategoryListHandler {
+	return decorator.ApplyQueryDecorators[CategoryListQuery, CategoryListResult](
+		&categoryListHandler{rm: rm},
+		logger,
+		client,
+	)
 }
 
-func (h CategoryListHandler) Handle(ctx context.Context) (CategoryListView, error) {
+func (h *categoryListHandler) Handle(ctx context.Context, _ CategoryListQuery) (CategoryListResult, error) {
 	list, err := h.rm.CategoryList(ctx)
 	if err != nil {
-		return CategoryListView{}, err
+		return CategoryListResult{}, err
 	}
 
-	return CategoryListView{
+	return CategoryListResult{
 		Count: len(list),
 		Items: list,
 	}, nil

@@ -2,34 +2,37 @@ package command
 
 import (
 	"context"
-	"github.com/qmstar0/BlogLite-api/internal/articles/domain/articles"
+	"github.com/yuyayang02/BlogLite-api/internal/articles/domain/articles"
+	"github.com/yuyayang02/BlogLite-api/internal/common/errors"
 )
 
 type ChangeArticleCategory struct {
-	Uri        string
-	CategoryID string
+	URI           string
+	NewCategoryID string
 }
 
 type ChangeArticleCategoryHandler struct {
-	repo articles.ArticleRepository
-	ser  CategoryValidityCheckService
+	repo          articles.ArticleRepository
+	categoryCheck CategoryValidityCheckService
 }
 
-func NewChangeArticleCategoryHandler(repo articles.ArticleRepository, ser CategoryValidityCheckService) *ChangeArticleCategoryHandler {
-	return &ChangeArticleCategoryHandler{repo: repo, ser: ser}
-}
-
-func (h ChangeArticleCategoryHandler) Handle(ctx context.Context, cmd ChangeArticleCategory) error {
-	uri := articles.NewUri(cmd.Uri)
-	if err := uri.CheckFormat(); err != nil {
+func (h ChangeArticleCategoryHandler) Hanlde(ctx context.Context, cmd ChangeArticleCategory) error {
+	uri, err := articles.NewUri(cmd.URI)
+	if err != nil {
 		return err
 	}
 
 	return h.repo.UpdateArticle(ctx, uri, func(article *articles.Article) (*articles.Article, error) {
-		if err := h.ser.CategoryExist(ctx, cmd.CategoryID); err != nil {
+		err := h.categoryCheck.CategoryExist(ctx, cmd.NewCategoryID)
+		if err != nil {
 			return nil, err
 		}
-		article.ChangeCategory(cmd.CategoryID)
+
+		err = article.SetCategory(cmd.NewCategoryID)
+		if err != nil {
+			return nil, errors.Wrap(err, errors.ErrorCodeDomainError, "设置分类失败")
+		}
+
 		return article, nil
 	})
 }

@@ -39,7 +39,7 @@ package service_test
 //	version := "d1c120bc"
 //	view, err := app.Query.ArticleMetadata.Handle(ctx, query.ArticleMetadata{
 //		URI:     "test",
-//		Version: &version,
+//		Hash: &version,
 //	})
 //	assert.NoError(t, err)
 //	assert.Equal(t, view.URI, "test")
@@ -106,14 +106,14 @@ package service_test
 //func testRemoveVersion(t *testing.T, app *application.App, ctx context.Context, version string) {
 //	assert.NoError(t, app.Command.RemoveVersion.Handle(ctx, command.RemoveVersion{
 //		URI:     "test",
-//		Version: version,
+//		Hash: version,
 //	}))
 //}
 //
 //func testSetArticleVersion(t *testing.T, app *application.App, ctx context.Context, version string) {
 //	assert.NoError(t, app.Command.SetArticleVersion.Handle(ctx, command.SetArticleVersion{
 //		URI:     "test",
-//		Version: version,
+//		Hash: version,
 //	}))
 //}
 //

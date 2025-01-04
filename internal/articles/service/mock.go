@@ -4,8 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/ThreeDotsLabs/watermill/message"
-	"github.com/qmstar0/BlogLite-api/internal/articles/domain/articles"
-	"github.com/qmstar0/BlogLite-api/internal/common/domain"
+	"github.com/yuyayang02/BlogLite-api/internal/articles/domain/articles"
 )
 
 type MockCategoryValidityCheckService struct {

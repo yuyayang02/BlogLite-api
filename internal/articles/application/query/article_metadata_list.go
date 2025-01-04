@@ -2,8 +2,8 @@ package query
 
 import (
 	"context"
-	"github.com/qmstar0/BlogLite-api/internal/common/constant"
-	"github.com/qmstar0/BlogLite-api/pkg/utils"
+	"github.com/yuyayang02/BlogLite-api/internal/common/constant"
+	"github.com/yuyayang02/BlogLite-api/internal/common/utils"
 )
 
 type ArticleMetadataList struct {
@@ -14,7 +14,8 @@ type ArticleMetadataList struct {
 }
 
 type ArticleMetadataListReadmodel interface {
-	ArticleMetadataList(ctx context.Context, offset, limit int, tags []string, categoryID *string) ([]ArticleMetadataResult, error)
+	// ArticleMetadataList 返回总文章数，当前页数据，错误
+	ArticleMetadataList(ctx context.Context, offset, limit int, tags []string, categoryID *string) (int64, []ArticleMetadataResult, error)
 }
 
 type ArticleMetadataListHandler struct {
@@ -39,27 +40,20 @@ func (h ArticleMetadataListHandler) Handle(ctx context.Context, query ArticleMet
 		limit = *query.Limit
 	}
 
-	list, err := h.rm.ArticleMetadataList(
+	total, list, err := h.rm.ArticleMetadataList(
 		ctx,
 		utils.Offset(page, limit),
-		limit+1,
+		limit,
 		query.Tags,
 		query.Category,
 	)
-
 	if err != nil {
 		return ArticleMetadataListResult{}, err
 	}
-	listLen := len(list)
-	next := listLen > limit
-	if next {
-		list = list[:listLen-1]
-	}
+
 	return ArticleMetadataListResult{
-		Count: len(list),
+		Total: int(total),
 		Page:  page,
 		Items: list,
-		Prev:  page > 1,
-		Next:  next,
 	}, nil
 }

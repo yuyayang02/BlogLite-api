@@ -2,20 +2,38 @@ package articles
 
 import "time"
 
-type ArticleInitializedSuccessfullyEvent struct {
-	URI        string
+type ArticleCreatedEvent struct {
+	URI string
+
+	CurrentVersion string
+
 	CategoryID string
+	Tags       []string
+
+	State int
+
+	Title       string
+	Body        string
+	Description string
+	CreatedAt   time.Time
 }
 
-type ArticleVisibilityChangedEvent struct {
-	URI        string
-	Visibility bool
+type ArticleDeletedEvent struct {
+	URI string
 }
 
-type ArticleFirstVersionCreatedEvent struct {
-	URI       string
-	Version   string
-	CreatedAt time.Time
+type ArticleContentUpdatedEvent struct {
+	URI string
+
+	PreviousVersion string
+	CurrentVersion  string
+
+	Tags []string
+
+	Title       string
+	Body        string
+	Description string
+	Updated     time.Time
 }
 
 type ArticleCategoryChangedEvent struct {
@@ -24,48 +42,16 @@ type ArticleCategoryChangedEvent struct {
 	NewCategoryID string
 }
 
-type ArticleTagsModifiedEvent struct {
-	URI     string
-	OldTags []string
-	NewTags []string
-}
-
-type ArticleDeletedEvent struct {
+type ArticleContentRevertedEvent struct {
 	URI string
+
+	RevertedVersion []string
+	CurrentVersion  string
+
+	Updated time.Time
 }
 
-type ArticleContentSetSuccessfullyEvent struct {
-	URI     string
-	Version string
-}
-
-type ArticleNewVersionCreatedEvent struct {
-	URI         string
-	Version     string
-	Title       string
-	Content     string
-	Description string
-	Source      string
-	Note        string
-	CreatedAt   time.Time
-}
-
-type ArticleVersionContentDeletedEvent struct {
-	URI     string
-	Version string
-}
-
-type CategoryCreatedEvent struct {
-	Slug        string
-	Name        string
-	Description string
-}
-
-type CategoryDescriptionModifiedEvent struct {
-	Slug        string
-	Description string
-}
-
-type CategoryDeletedEvent struct {
-	Slug string
+type ArticleStateChangedEvent struct {
+	URI   string
+	State int
 }
